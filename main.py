@@ -2,11 +2,11 @@ import sys
 from PyQt5 import QtWidgets, Qt
 from PyQt5.QtCore import QDate, Qt as qt
 from PyQt5.QtGui import QIcon
-import ciso8601
-#
+
 # Resourcendatei aktualisieren
 # pyrcc5 icons.qrc -o icons_rc.py
 #
+
 from items import newItem, item
 from db import db
 from ui.MainWindow import Ui_MainWindow
