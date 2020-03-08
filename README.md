@@ -1,3 +1,3 @@
-# vorratslager
+# Vorratslager
 
-Kleines Programm zum verwalten seiner Vorräte
+Kleines Programm zum Verwalten seiner Vorräte
