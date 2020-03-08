@@ -6,6 +6,7 @@ from PyQt5.QtGui import QIcon
 # Resourcendatei aktualisieren
 # pyrcc5 icons.qrc -o icons_rc.py
 #
+from PyQt5.QtWidgets import QDialog
 
 from items import newItem, item
 from db import db
@@ -70,7 +71,7 @@ class newEntryWindow(QtWidgets.QDialog):
 
     def cancel(self):
         self.clearLe()
-        self.close()
+        self.reject()
 
     def clearLe(self):
         self.ui.Le_Name.clear()
@@ -97,7 +98,8 @@ class newEntryWindow(QtWidgets.QDialog):
 
     def openLocationWindow(self):
         self.editLocationWindow = ui.editLocSubWindow.editLocSubWindow()
-        self.editLocationWindow.exec()
+        if self.editLocationWindow.exec() == QDialog.Accepted:
+            print("fertig")
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -161,7 +163,7 @@ class MainWindow(QtWidgets.QMainWindow):
             for i in items:
                 data = []
                 listItem = Qt.QListWidgetItem()
-                listItem.setText(i['name'] + ' ' + str(i['menge']))
+                listItem.setText(str(i['anzahl']) + 'x ' + i['name'] + ' ' + str(i['menge']))
                 for e in i:
                     data.append(i[e])
                 if i['type'] == 'food':
@@ -185,7 +187,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
     def addNewEntry(self):
-        self.newEntry.exec()
+        if self.newEntry.exec() == QDialog.Rejected:
+            print("fertig")
+            self.readDataIntoTable()
+
 
     def openEditLocationWindow(self):
         self.editLocationWindow.exec()

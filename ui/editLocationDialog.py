@@ -162,12 +162,13 @@ class Ui_Dialog(object):
         self.horizontalLayout.addLayout(self.verticalLayout_4)
         self.verticalLayout_7.addLayout(self.horizontalLayout)
         self.buttonBox = QtWidgets.QDialogButtonBox(Dialog)
-        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
+        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Close)
         self.buttonBox.setCenterButtons(False)
         self.buttonBox.setObjectName("buttonBox")
         self.verticalLayout_7.addWidget(self.buttonBox)
 
         self.retranslateUi(Dialog)
+        self.buttonBox.accepted.connect(Dialog.accept)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
