@@ -1,0 +1,11 @@
+<RCC>
+  <qresource prefix="icon">
+    <file>grinder.svg</file>
+    <file>spoon-and-a-fork.svg</file>
+    <file>food_1.svg</file>
+    <file>emblem-synchronizing.svg</file>
+    <file>emblem-new.svg</file>
+    <file>emblem-remove.svg</file>
+    <file>emblem-system.svg</file>
+  </qresource>
+</RCC>
