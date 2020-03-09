@@ -83,13 +83,14 @@ class newEntryWindow(QtWidgets.QDialog):
         self.ui.dE_MHD.setDate(datetime.datetime.today())
         self.ui.cb_mainLocation.setCurrentIndex(-1)
         self.ui.cb_subLocation.setCurrentIndex(-1)
+        self.ui.te_notes.clear()
         self.ui.le_minMenge.clear()
 
 
     def setItem(self):
         newitem = item.foodItem(self.ui.Le_Name.text(), self.ui.Le_Anzahl.text(), self.ui.le_minMenge.text())
         newitem.setLocation(self.ui.cb_mainLocation.itemData(self.ui.cb_mainLocation.currentIndex()), self.ui.cb_subLocation.itemData(self.ui.cb_subLocation.currentIndex()))
-        newitem.setDetails(self.ui.Le_Kategorie.text())
+        newitem.setDetails(self.ui.Le_Kategorie.text(), self.ui.te_notes.toPlainText())
         date = self.ui.dE_MHD.date().toString('dd.MM.yyyy')
         newitem.setFoodDetails(date, self.ui.le_Menge.text(), self.ui.le_portionen.text(), self.ui.le_Kalorien.text())
         if newItem.addItemToDb(newitem):

@@ -29,8 +29,8 @@ def create_table(conn, create_table_sql):
 
 
 def create_item(conn, item):
-    sql = ''' INSERT INTO items(type, name, anzahl, minAnzahl, kategorie, mainLocation, subLocation,mhd,menge,portionen,kcal) 
-                VALUES(?,?,?,?,?,?,?,?,?,?,?)'''
+    sql = ''' INSERT INTO items(type, name, anzahl, minAnzahl, kategorie, mainLocation, subLocation,mhd,menge,portionen,kcal,notes) 
+                VALUES(?,?,?,?,?,?,?,?,?,?,?,?)'''
 
     cursor = conn.cursor()
     cursor.execute(sql, item)
@@ -52,7 +52,8 @@ def checkDb():
                                     mhd date,
                                     menge text,
                                     portionen INTEGER,
-                                    kcal INTEGER
+                                    kcal INTEGER,
+                                    notes TEXT
                                 ); """
 
     sql_create_mainLocation_table = """ CREATE TABLE IF NOT EXISTS mainLocation

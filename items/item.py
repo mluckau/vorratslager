@@ -38,8 +38,9 @@ class item():
     def getSubLocation(self):
         return self.subLocation
 
-    def setDetails(self, kategorie):
+    def setDetails(self, kategorie, notes):
         self.kategorie = kategorie
+        self.notes = notes
 
 
 
@@ -68,7 +69,8 @@ class foodItem(item):
                 self.mhd,
                 self.menge,
                 self.portionen,
-                self.kalorien)
+                self.kalorien,
+                self.notes)
 
 
 
