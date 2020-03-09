@@ -54,20 +54,30 @@ class newEntryWindow(QtWidgets.QDialog):
 
     def initUi(self):
         self.ui.cb_mainLocation.clear()
+        self.ui.cb_subLocation.setEnabled(False)
         mainLocation = db.readLocations('main')
+        self.ui.cb_mainLocation.addItem('', -1)
         for e in mainLocation:
             self.ui.cb_mainLocation.addItem(str(e['name']), e['id'])
         self.ui.cb_mainLocation.setCurrentIndex(-1)
         self.ui.cb_mainLocation.currentIndexChanged.connect(self.getSubLocations)
 
     def getSubLocations(self, index):
-        self.ui.cb_subLocation.clear()
         mainLocation = self.ui.cb_mainLocation.itemData(index)
-        if not mainLocation == None:
-            subLocations = db.readLocations('sub', mainLocation)
-            for e in subLocations:
-                self.ui.cb_subLocation.addItem(str(e['name']), e['id'])
-            self.ui.cb_subLocation.setCurrentIndex(0)
+        if mainLocation == -1:
+            self.ui.cb_subLocation.clear()
+            self.ui.cb_subLocation.setEnabled(False)
+        elif not self.ui.cb_mainLocation.currentIndex() == -1:
+            self.ui.cb_subLocation.setEnabled(True)
+            self.ui.cb_subLocation.clear()
+            self.ui.cb_subLocation.addItem('', -1)
+            if not mainLocation == None:
+                subLocations = db.readLocations('sub', mainLocation)
+                for e in subLocations:
+                    self.ui.cb_subLocation.addItem(str(e['name']), e['id'])
+                self.ui.cb_subLocation.setCurrentIndex(0)
+        else:
+            self.ui.cb_subLocation.setEnabled(False)
 
     def cancel(self):
         self.clearLe()
@@ -89,13 +99,23 @@ class newEntryWindow(QtWidgets.QDialog):
 
     def setItem(self):
         newitem = item.foodItem(self.ui.Le_Name.text(), self.ui.Le_Anzahl.text(), self.ui.le_minMenge.text())
-        newitem.setLocation(self.ui.cb_mainLocation.itemData(self.ui.cb_mainLocation.currentIndex()), self.ui.cb_subLocation.itemData(self.ui.cb_subLocation.currentIndex()))
+        newitem.setLocation(self.getLocation())
         newitem.setDetails(self.ui.Le_Kategorie.text(), self.ui.te_notes.toPlainText())
         date = self.ui.dE_MHD.date().toString('dd.MM.yyyy')
         newitem.setFoodDetails(date, self.ui.le_Menge.text(), self.ui.le_portionen.text(), self.ui.le_Kalorien.text())
         if newItem.addItemToDb(newitem):
             self.ui.lbl_StatusText.setText("Eintrag erfolgreich angelegt")
             self.clearLe()
+
+    def getLocation(self):
+        mainLocation = self.ui.cb_mainLocation.itemData(self.ui.cb_mainLocation.currentIndex())
+        subLocation = self.ui.cb_subLocation.itemData(self.ui.cb_subLocation.currentIndex())
+        if mainLocation == -1:
+            mainLocation = ''
+        if subLocation == -1:
+            subLocation = ''
+        return (mainLocation, subLocation)
+
 
     def openLocationWindow(self):
         self.editLocationWindow = ui.editLocSubWindow.editLocSubWindow()

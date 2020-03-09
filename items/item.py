@@ -31,9 +31,9 @@ class item():
     def getMainLocation(self):
         return self.mainLocation
 
-    def setLocation(self, mainLocation, subLocation):
-        self.mainLocation = mainLocation
-        self.subLocation = subLocation
+    def setLocation(self, location):
+        self.mainLocation = location[0]
+        self.subLocation = location[1]
 
     def getSubLocation(self):
         return self.subLocation
