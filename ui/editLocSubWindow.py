@@ -117,9 +117,16 @@ class editLocSubWindow(QtWidgets.QDialog):
     def removesublocation(self):
         currentitem = self.sublocationlist.selectedItems()
         locationtoremove = currentitem[0].data(qt.UserRole)
-        if db.removeLocation('sub', locationtoremove[0]):
-            print('erfolgreich gelöscht')
+        buttonReply = QMessageBox.question(self, 'Löschen!',
+                                           "Willst du den Lagerunterort \"{ort}\" wirklich löschen?".format(
+                                               ort=locationtoremove[1]),
+                                           QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if buttonReply == QMessageBox.Yes:
+            if db.removeLocation('sub', locationtoremove[0]):
+                print('erfolgreich gelöscht')
             self.updateSubLocationlist()
+        else:
+            pass
 
     def removemainlocation(self):
 
