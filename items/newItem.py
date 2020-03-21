@@ -17,7 +17,17 @@ def newItem():
 def addItemToDb(item):
     print(item.getDetails())
     #db.create_connection('data.sqlite')
-    if db.writeToDb(item):
+    itemid = db.writeToDb(item)
+    if itemid:
+        return itemid
+    else:
+        return False
+
+
+def addImageToDb(imgdata):
+    print("Speichere Bilddaten")
+    result = db.writeImgToDb(imgdata)
+    if result:
         return True
     else:
         return False

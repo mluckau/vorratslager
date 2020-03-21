@@ -6,18 +6,25 @@ icon_nonfood = 'ui/tool.svg'
 
 
 class item():
-    def __init__(self, name, anzahl, minAnzahl, kategorie, lagerfach):
+    def __init__(self, name, anzahl, minAnzahl, kategorie, lagerfach, hasimage):
         self.name = name
         self.anzahl = anzahl
         self.minAnzahl = minAnzahl
         self.kategorie = kategorie
         self.lagerfach = lagerfach
+        self.hasimage = hasimage
 
     def getName(self):
         return self.name
 
     def setAnzahl(self, anzahl):
         self.anzahl = anzahl
+
+    def sethasImage(self, hasimage):
+        self.hasimage = hasimage
+
+    def gethasImage(self):
+        return self.hasimage
 
     def getAnzahl(self):
         return self.anzahl
@@ -47,8 +54,8 @@ class item():
 
 class foodItem(item):
 
-    def __init__(self, name, anzahl, minAnzahl=None, kategorie=None, lagerfach = None):
-        item.__init__(self, name, anzahl, minAnzahl, kategorie, lagerfach)
+    def __init__(self, name, anzahl, minAnzahl=None, kategorie=None, lagerfach = None, hasimage = 0):
+        item.__init__(self, name, anzahl, minAnzahl, kategorie, lagerfach, hasimage)
         self.type = 'food'
 
     #TODO Food spezifische Details hinzufügen
@@ -70,7 +77,8 @@ class foodItem(item):
                 self.menge,
                 self.portionen,
                 self.kalorien,
-                self.notes)
+                self.notes,
+                self.hasimage)
 
 
 
@@ -90,4 +98,5 @@ class nonFoodItem(item):
                 self.anzahl,
                 self.kategorie,
                 self.mainLocation,
-                self.subLocation)
+                self.subLocation,
+                self.hasImage)

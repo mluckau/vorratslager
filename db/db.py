@@ -29,8 +29,8 @@ def create_table(conn, create_table_sql):
 
 
 def create_item(conn, item):
-    sql = ''' INSERT INTO items(type, name, anzahl, minAnzahl, kategorie, mainLocation, subLocation,mhd,menge,portionen,kcal,notes) 
-                VALUES(?,?,?,?,?,?,?,?,?,?,?,?)'''
+    sql = ''' INSERT INTO items(type, name, anzahl, minAnzahl, kategorie, mainLocation, subLocation,mhd,menge,portionen,kcal,notes,hasimage) 
+                VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)'''
 
     cursor = conn.cursor()
     cursor.execute(sql, item)
@@ -38,6 +38,16 @@ def create_item(conn, item):
 
 
 def checkDb():
+
+    sql_create_item_img_table = """CREATE TABLE IF NOT EXISTS item_img
+                                (
+                                    id INTEGER not null
+                                        constraint item_img_pk
+                                            primary key autoincrement,
+                                    itemid INTEGER not null,
+                                    imgname TEXT not null,
+                                    imgdata BLOB not null
+                                );"""
 
     sql_create_item_table = """ CREATE TABLE IF NOT EXISTS items
                                 (
@@ -53,7 +63,8 @@ def checkDb():
                                     menge text,
                                     portionen INTEGER,
                                     kcal INTEGER,
-                                    notes TEXT
+                                    notes TEXT,
+                                    hasimage INTEGER default 0
                                 ); """
 
     sql_create_mainLocation_table = """ CREATE TABLE IF NOT EXISTS mainLocation
@@ -74,6 +85,7 @@ def checkDb():
     conn = create_connection()
 
     if conn is not None:
+        create_table(conn, sql_create_item_img_table)
         create_table(conn, sql_create_item_table)
         create_table(conn, sql_create_mainLocation_table)
         create_table(conn, sql_create_subLocation_table)
@@ -91,8 +103,31 @@ def writeToDb(item):
     except Error as e:
         print(e)
         return False
+    return lastid
 
-    return True
+
+def writeimgdata(conn, imgdata):
+    cursor = conn.cursor()
+    try:
+        sql = """ INSERT INTO item_img (itemid, imgname, imgdata) VALUES (?,?,?)"""
+        cursor.execute(sql, imgdata)
+        conn.commit()
+        return True
+    except sqlite3.Error as e:
+        return False
+
+
+def writeImgToDb(imgdata):
+    conn = create_connection()
+    try:
+        with conn:
+            result = writeimgdata(conn, imgdata)
+        conn.close()
+    except Error as e:
+        print(e)
+        return False
+    return result
+
 
 
 def getAllItems(conn):
@@ -115,6 +150,12 @@ def getItem(conn, id):
     rows = cursor.fetchone()
     return rows
 
+def getItemImage(conn, itemid):
+    cursor = conn.cursor()
+    cursor.execute("SELECT imgdata FROM item_img WHERE itemid = {itemid};".format(itemid=itemid))
+    imagedata = cursor.fetchall()
+    return imagedata
+
 def getSubLocations(conn, index):
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM subLocation WHERE mainLocation = {id};".format(id=index))
@@ -134,6 +175,14 @@ def readItem(id):
     conn = create_connection()
     with conn:
         result = getItem(conn, id)
+    conn.close()
+    return result
+
+
+def readItemImage(itemid):
+    conn = create_connection()
+    with conn:
+        result = getItemImage(conn, itemid)
     conn.close()
     return result
 

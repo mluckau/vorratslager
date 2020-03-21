@@ -1,12 +1,12 @@
 import sys
 from PyQt5 import QtWidgets, Qt
 from PyQt5.QtCore import QDate, Qt as qt
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QPalette, QImage, QPixmap
 
 # Resourcendatei aktualisieren
 # pyrcc5 icons.qrc -o icons_rc.py
 #
-from PyQt5.QtWidgets import QDialog
+from PyQt5.QtWidgets import QDialog, QSizePolicy, QFileDialog, QMessageBox
 
 from items import newItem, item
 from db import db
@@ -41,8 +41,14 @@ class newEntryWindow(QtWidgets.QDialog):
     def __init__(self, parent = None):
         super().__init__(parent)
 
+        self.image = None
         self.ui = NewEntryWindow()
         self.ui.setupUi(self)
+
+        self.ui.imageLabel.setBackgroundRole(QPalette.Base)
+        self.ui.imageLabel.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.ui.imageLabel.setMaximumHeight(200)
+        self.ui.imageLabel.setMaximumWidth(200)
 
         self.setWindowTitle("Neuer Eintrag")
         self.ui.dE_MHD.setDisplayFormat("dd.MM.yyyy")
@@ -61,6 +67,34 @@ class newEntryWindow(QtWidgets.QDialog):
             self.ui.cb_mainLocation.addItem(str(e['name']), e['id'])
         self.ui.cb_mainLocation.setCurrentIndex(-1)
         self.ui.cb_mainLocation.currentIndexChanged.connect(self.getSubLocations)
+        self.ui.pB_loadImage.clicked.connect(self.openImage)
+
+    def openImage(self):
+        #https://gist.github.com/acbetter/32c575803ec361c3e82064e60db4e3e0
+        options = QFileDialog.Options()
+
+        filename, _ = QFileDialog.getOpenFileName(self, 'Bild laden', '', 'Bilder (*.png *.jpg *.gif)', options=options)
+
+        if filename:
+            image = QImage(filename)
+            if image.isNull():
+                QMessageBox.information(self, "Image Viewer", "Cannot load %s." % filename)
+                return
+
+            #self.ui.imageLabel.setPixmap(QPixmap.fromImage(image).scaled(self.ui.imageLabel.maximumHeight(),self.ui.imageLabel.maximumWidth(), Qt.KeepAspectRatio))
+            self.ui.imageLabel.setPixmap(QPixmap.fromImage(image))
+            self.scaleFactor = 1.0
+            self.ui.imageLabel.setScaledContents(True)
+            self.ui.imageLabel.adjustSize()
+            self.filename = filename
+            self.image = image
+            self.imagedata = self.convertToBinaryData(filename)
+
+    def convertToBinaryData(self, filename):
+        # Convert digital data to binary format
+        with open(filename, 'rb') as file:
+            blobData = file.read()
+        return blobData
 
     def getSubLocations(self, index):
         mainLocation = self.ui.cb_mainLocation.itemData(index)
@@ -103,9 +137,24 @@ class newEntryWindow(QtWidgets.QDialog):
         newitem.setDetails(self.ui.Le_Kategorie.text(), self.ui.te_notes.toPlainText())
         date = self.ui.dE_MHD.date().toString('dd.MM.yyyy')
         newitem.setFoodDetails(date, self.ui.le_Menge.text(), self.ui.le_portionen.text(), self.ui.le_Kalorien.text())
-        if newItem.addItemToDb(newitem):
+
+        if not self.image:
+            itemid = newItem.addItemToDb(newitem)
             self.ui.lbl_StatusText.setText("Eintrag erfolgreich angelegt")
             self.clearLe()
+        else:
+            newitem.sethasImage(1)
+            itemid = newItem.addItemToDb(newitem)
+            imgdata = (itemid, self.filename, self.imagedata)
+            result = newItem.addImageToDb(imgdata)
+            if result:
+                print("ID: " + str(itemid))
+                print("Bild erfolgreich gespeichert")
+                self.ui.lbl_StatusText.setText("Eintrag erfolgreich angelegt")
+                self.clearLe()
+            else:
+                print("Da is was schief gelaufen")
+
 
     def getLocation(self):
         mainLocation = self.ui.cb_mainLocation.itemData(self.ui.cb_mainLocation.currentIndex())
